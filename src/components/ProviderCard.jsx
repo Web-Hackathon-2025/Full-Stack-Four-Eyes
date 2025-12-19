@@ -75,7 +75,7 @@ const ProviderCard = ({ provider }) => {
 
             <div className="provider-services">
                 {provider.services?.slice(0, 3).map((service, idx) => (
-                    <span key={idx} className="service-tag">{service}</span>
+                    <span key={idx} className="service-tag">{typeof service === 'string' ? service : service.name}</span>
                 ))}
                 {provider.services?.length > 3 && (
                     <span className="service-tag more">+{provider.services.length - 3}</span>

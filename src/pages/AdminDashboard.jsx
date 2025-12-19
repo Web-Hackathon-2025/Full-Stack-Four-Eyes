@@ -11,7 +11,7 @@ const AdminDashboard = () => {
     const { userData } = useAuth();
     const { sendNotification } = useNotifications();
 
-    const [activeTab, setActiveTab] = useState('verification');
+    const [activeTab, setActiveTab] = useState('users');
     const [providers, setProviders] = useState([]);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -83,11 +83,9 @@ const AdminDashboard = () => {
         }
     };
 
-    const pendingVerifications = providers.filter(p => p.verificationStatus === 'pending');
-    const verifiedProviders = providers.filter(p => p.verificationStatus === 'approved');
+    const verifiedProviders = providers.filter(p => p.isVerified);
 
     const tabs = [
-        { id: 'verification', label: 'CNIC Verification', icon: <FiShield />, count: pendingVerifications.length },
         { id: 'users', label: 'User Management', icon: <FiUsers />, count: users.length },
         { id: 'providers', label: 'Providers', icon: <FiCheck />, count: providers.length }
     ];
@@ -113,16 +111,16 @@ const AdminDashboard = () => {
                 {/* Stats */}
                 <div className="admin-stats">
                     <div className="stat-card">
-                        <span className="stat-value">{pendingVerifications.length}</span>
-                        <span className="stat-label">Pending Verification</span>
+                        <span className="stat-value">{users.length}</span>
+                        <span className="stat-label">Total Users</span>
+                    </div>
+                    <div className="stat-card">
+                        <span className="stat-value">{providers.length}</span>
+                        <span className="stat-label">Total Providers</span>
                     </div>
                     <div className="stat-card">
                         <span className="stat-value">{verifiedProviders.length}</span>
-                        <span className="stat-label">Verified Providers</span>
-                    </div>
-                    <div className="stat-card">
-                        <span className="stat-value">{users.length}</span>
-                        <span className="stat-label">Total Users</span>
+                        <span className="stat-label">ID Verified</span>
                     </div>
                 </div>
 
@@ -149,63 +147,6 @@ const AdminDashboard = () => {
                     </div>
                 ) : (
                     <>
-                        {/* CNIC Verification Tab */}
-                        {activeTab === 'verification' && (
-                            <div className="admin-section">
-                                <h2>Pending CNIC Verification</h2>
-                                {pendingVerifications.length === 0 ? (
-                                    <div className="empty-state">
-                                        <span className="empty-icon">✓</span>
-                                        <h3>All caught up!</h3>
-                                        <p>No pending verifications</p>
-                                    </div>
-                                ) : (
-                                    <div className="admin-list">
-                                        {pendingVerifications.map(provider => (
-                                            <div key={provider.id} className="admin-card">
-                                                <div className="card-header">
-                                                    <img
-                                                        src={provider.photoURL || getPlaceholderAvatar(provider.name)}
-                                                        alt={provider.name}
-                                                        className="user-avatar"
-                                                    />
-                                                    <div>
-                                                        <h3>{provider.name}</h3>
-                                                        <span className="user-email">{provider.email}</span>
-                                                    </div>
-                                                    <span className="badge badge-warning">Pending</span>
-                                                </div>
-                                                <div className="card-details">
-                                                    <span>Category: {provider.category}</span>
-                                                    <span>Region: {provider.region}</span>
-                                                </div>
-                                                <div className="card-actions">
-                                                    <button
-                                                        className="btn btn-secondary"
-                                                        onClick={() => setCnicModal(provider)}
-                                                    >
-                                                        <FiEye /> View CNIC
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-success"
-                                                        onClick={() => handleVerifyProvider(provider.id, true)}
-                                                    >
-                                                        <FiCheck /> Approve
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-danger"
-                                                        onClick={() => handleVerifyProvider(provider.id, false)}
-                                                    >
-                                                        <FiX /> Reject
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
                         {/* Users Tab */}
                         {activeTab === 'users' && (
                             <div className="admin-section">

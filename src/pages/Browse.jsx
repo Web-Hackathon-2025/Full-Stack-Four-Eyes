@@ -52,7 +52,7 @@ const Browse = () => {
                 filtered = providersList.filter(p =>
                     p.name?.toLowerCase().includes(searchLower) ||
                     p.description?.toLowerCase().includes(searchLower) ||
-                    p.services?.some(s => s.toLowerCase().includes(searchLower))
+                    p.services?.some(s => s.name?.toLowerCase().includes(searchLower))
                 );
             }
 
