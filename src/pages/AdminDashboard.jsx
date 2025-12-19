@@ -4,7 +4,7 @@ import { db } from '../config/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsContext';
 import { getPlaceholderAvatar } from '../utils/uploadHelper';
-import { FiUsers, FiShield, FiCheck, FiX, FiAlertTriangle, FiBan, FiUnlock, FiEye } from 'react-icons/fi';
+import { FiUsers, FiShield, FiCheck, FiX, FiAlertTriangle, FiSlash, FiUnlock, FiEye } from 'react-icons/fi';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
                                                             className="btn btn-danger-outline"
                                                             onClick={() => handleBanUser(user.id, true)}
                                                         >
-                                                            <FiBan /> Ban User
+                                                            <FiSlash /> Ban User
                                                         </button>
                                                     )}
                                                 </div>
@@ -275,8 +275,8 @@ const AdminDashboard = () => {
                                                     <span className="user-email">{provider.category}</span>
                                                 </div>
                                                 <span className={`badge ${provider.verificationStatus === 'approved' ? 'badge-success' :
-                                                        provider.verificationStatus === 'pending' ? 'badge-warning' :
-                                                            'badge-danger'
+                                                    provider.verificationStatus === 'pending' ? 'badge-warning' :
+                                                        'badge-danger'
                                                     }`}>
                                                     {provider.verificationStatus || 'Not Submitted'}
                                                 </span>

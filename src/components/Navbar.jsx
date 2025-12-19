@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsContext';
-import { FiHome, FiSearch, FiLogOut, FiGrid, FiSettings, FiBell } from 'react-icons/fi';
+import { FiHome, FiSearch, FiLogOut, FiGrid, FiSettings, FiBell, FiUser } from 'react-icons/fi';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -58,10 +58,15 @@ const Navbar = () => {
                                 <span>Dashboard</span>
                             </Link>
                             {userData?.role === 'provider' && (
-                                <Link to="/provider-setup" className="nav-link">
-                                    <FiSettings />
-                                    <span>Profile</span>
-                                </Link>
+                                <>
+                                    <Link to={`/provider/${user.uid}`} className="nav-link">
+                                        <FiUser />
+                                        <span>My Profile</span>
+                                    </Link>
+                                    <Link to="/provider-setup" className="nav-link" title="Edit Profile">
+                                        <FiSettings />
+                                    </Link>
+                                </>
                             )}
                             <div className="user-menu">
                                 <span className="user-name">{userData?.name || 'User'}</span>

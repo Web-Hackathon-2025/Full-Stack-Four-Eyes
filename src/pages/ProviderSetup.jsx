@@ -218,8 +218,7 @@ const ProviderSetup = () => {
                 photoURL: formData.photoURL,
                 cnicFrontURL: formData.cnicFrontURL,
                 cnicBackURL: formData.cnicBackURL,
-                isApproved: false, // Admin needs to approve
-                isVerified: !!(formData.cnicFrontURL && formData.cnicBackURL), // Has CNIC uploaded
+                isVerified: !!(formData.cnicFrontURL && formData.cnicBackURL),
                 verificationStatus: (formData.cnicFrontURL && formData.cnicBackURL) ? 'pending' : 'not_submitted',
                 avgRating: 0,
                 totalReviews: 0,

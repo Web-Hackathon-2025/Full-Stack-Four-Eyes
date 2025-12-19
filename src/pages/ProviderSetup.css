@@ -118,15 +118,20 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-fast);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-align: center;
 }
 
 .category-btn:hover {
     border-color: var(--primary);
+    color: var(--text-primary);
 }
 
 .category-btn.active {
     border-color: var(--primary);
     background: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
 }
 
 .cat-icon {

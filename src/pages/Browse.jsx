@@ -24,26 +24,26 @@ const Browse = () => {
     const fetchProviders = async () => {
         setLoading(true);
         try {
-            let q = query(
-                collection(db, 'providers'),
-                where('isApproved', '==', true)
-            );
+            // Fetch all providers (during development - for production, filter by isApproved)
+            let q = query(collection(db, 'providers'));
 
             // Add category filter
             if (filters.category) {
                 q = query(q, where('category', '==', filters.category));
             }
 
-            // Add region filter
-            if (filters.region) {
-                q = query(q, where('region', '==', filters.region));
-            }
-
             const snapshot = await getDocs(q);
-            const providersList = snapshot.docs.map(doc => ({
+            let providersList = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
+
+            // Client-side region filter (to match partial city names like "Lahore, Gulberg")
+            if (filters.region) {
+                providersList = providersList.filter(p =>
+                    p.region?.toLowerCase().includes(filters.region.toLowerCase())
+                );
+            }
 
             // Client-side search filter
             let filtered = providersList;
