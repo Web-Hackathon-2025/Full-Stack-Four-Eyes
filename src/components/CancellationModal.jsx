@@ -31,13 +31,29 @@ const CancellationModal = ({ request, onClose, onCancelled, isProvider = false }
         try {
             const cancelledBy = isProvider ? 'provider' : 'customer';
             const otherUserId = isProvider ? request.customerId : request.providerId;
-            const otherUserName = isProvider ? request.customerName : request.providerName;
 
-            // Calculate penalty
+            // For mutual agreement, set pending status and wait for other party
+            if (cancellationType === CANCELLATION_TYPE.MUTUAL_AGREEMENT) {
+                await updateDoc(doc(db, 'requests', request.id), {
+                    status: REQUEST_STATUS.PENDING_MUTUAL_CANCEL,
+                    mutualCancelRequestedBy: cancelledBy,
+                    mutualCancelRequestedAt: serverTimestamp()
+                });
+
+                await sendNotification(otherUserId, {
+                    type: 'mutual_cancel_request',
+                    message: `${userData?.name} requested a mutual cancellation. Please accept or decline.`,
+                    requestId: request.id
+                });
+
+                onCancelled();
+                return;
+            }
+
+            // For without agreement - immediate cancellation with penalty
             const banDays = calculateBanDuration(request.requestedDate, cancellationType);
             const banEndDate = calculateBanEndDate(banDays);
 
-            // Update request
             await updateDoc(doc(db, 'requests', request.id), {
                 status: REQUEST_STATUS.CANCELLED,
                 cancelledBy,
@@ -59,7 +75,7 @@ const CancellationModal = ({ request, onClose, onCancelled, isProvider = false }
                 });
             }
 
-            // Check thresholds for the provider (affects reliability)
+            // Update provider cancel count
             if (isProvider) {
                 const providerRef = doc(db, 'providers', user.uid);
                 await updateDoc(providerRef, {
@@ -67,15 +83,14 @@ const CancellationModal = ({ request, onClose, onCancelled, isProvider = false }
                 });
             }
 
-            // Also decrement the other user's active request count
+            // Decrement other user's active request count
             await updateDoc(doc(db, 'users', otherUserId), {
                 activeRequestCount: increment(-1)
             });
 
-            // Notify the other party
             await sendNotification(otherUserId, {
                 type: 'cancellation',
-                message: `${userData?.name} cancelled the service request${banDays > 0 ? '' : ' (mutual agreement)'}`,
+                message: `${userData?.name} cancelled the request${banDays > 0 ? '' : ''}`,
                 requestId: request.id
             });
 

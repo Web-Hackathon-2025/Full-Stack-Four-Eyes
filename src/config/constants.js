@@ -75,9 +75,10 @@ export const REQUEST_STATUS = {
     REQUESTED: 'requested',
     CONFIRMED: 'confirmed',
     COMPLETED: 'completed',
-    PAID: 'paid',           // Cash payment confirmed
+    PAID: 'paid',
     CANCELLED: 'cancelled',
-    EXPIRED: 'expired'      // No response within 24 hours
+    EXPIRED: 'expired',
+    PENDING_MUTUAL_CANCEL: 'pending_mutual_cancel'  // Waiting for other party to accept
 };
 
 // Cancellation types
