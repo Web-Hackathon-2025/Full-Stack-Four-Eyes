@@ -172,6 +172,36 @@ const ProviderDashboard = () => {
         }
     };
 
+    // Accept mutual cancellation
+    const handleAcceptMutualCancel = async (request) => {
+        try {
+            await updateDoc(doc(db, 'requests', request.id), {
+                status: REQUEST_STATUS.CANCELLED,
+                cancelledAt: serverTimestamp(),
+                mutualCancelAccepted: true
+            });
+            await updateDoc(doc(db, 'users', request.customerId), { activeRequestCount: increment(-1) });
+            await updateDoc(doc(db, 'users', request.providerId), { activeRequestCount: increment(-1) });
+            fetchRequests();
+        } catch (error) {
+            console.error('Error accepting mutual cancel:', error);
+        }
+    };
+
+    // Decline mutual cancel
+    const handleDeclineMutualCancel = async (request) => {
+        try {
+            await updateDoc(doc(db, 'requests', request.id), {
+                status: REQUEST_STATUS.CONFIRMED,
+                mutualCancelRequestedBy: null,
+                mutualCancelRequestedAt: null
+            });
+            fetchRequests();
+        } catch (error) {
+            console.error('Error declining mutual cancel:', error);
+        }
+    };
+
     const getStatusBadge = (status) => {
         const statusConfig = {
             [REQUEST_STATUS.REQUESTED]: { label: 'New Request', class: 'status-pending' },
@@ -179,7 +209,8 @@ const ProviderDashboard = () => {
             [REQUEST_STATUS.COMPLETED]: { label: 'Completed', class: 'status-completed' },
             [REQUEST_STATUS.PAID]: { label: 'Paid', class: 'status-paid' },
             [REQUEST_STATUS.CANCELLED]: { label: 'Cancelled', class: 'status-cancelled' },
-            [REQUEST_STATUS.EXPIRED]: { label: 'Expired', class: 'status-expired' }
+            [REQUEST_STATUS.EXPIRED]: { label: 'Expired', class: 'status-expired' },
+            [REQUEST_STATUS.PENDING_MUTUAL_CANCEL]: { label: 'Cancel Pending', class: 'status-warning' }
         };
         return statusConfig[status] || { label: status, class: '' };
     };
@@ -329,6 +360,29 @@ const ProviderDashboard = () => {
                                                 <FiDollarSign /> Mark as Paid
                                             </button>
                                         )}
+
+                                        {/* Mutual Cancel - Accept/Decline */}
+                                        {request.status === REQUEST_STATUS.PENDING_MUTUAL_CANCEL &&
+                                            request.mutualCancelRequestedBy !== 'provider' && (
+                                                <>
+                                                    <button
+                                                        className="btn btn-success"
+                                                        onClick={() => handleAcceptMutualCancel(request)}
+                                                    >
+                                                        ✓ Accept Cancel
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        onClick={() => handleDeclineMutualCancel(request)}
+                                                    >
+                                                        ✗ Decline
+                                                    </button>
+                                                </>
+                                            )}
+                                        {request.status === REQUEST_STATUS.PENDING_MUTUAL_CANCEL &&
+                                            request.mutualCancelRequestedBy === 'provider' && (
+                                                <span className="status-badge status-warning">Waiting for approval</span>
+                                            )}
                                     </div>
                                 </div>
                             );
