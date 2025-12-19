@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { NotificationsProvider } from './context/NotificationsContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Browse from './pages/Browse';
@@ -33,7 +35,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 function AppRoutes() {
-  const { user, userData } = useAuth();
+  const { user } = useAuth();
 
   return (
     <>
@@ -99,6 +101,19 @@ function AppRoutes() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
+
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#1a1a2e',
+            color: '#fff',
+            border: '1px solid #2d2d4a',
+          },
+        }}
+      />
     </>
   );
 }
@@ -107,7 +122,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <NotificationsProvider>
+          <AppRoutes />
+        </NotificationsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

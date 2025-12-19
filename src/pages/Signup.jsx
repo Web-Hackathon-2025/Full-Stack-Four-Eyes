@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { REGIONS } from '../config/constants';
+import { CITIES, getDistricts } from '../config/constants';
 import { FiMail, FiLock, FiUser, FiMapPin, FiAlertCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import './Auth.css';
@@ -12,7 +12,8 @@ const Signup = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        region: '',
+        city: '',
+        district: '',
         role: 'customer'
     });
     const [error, setError] = useState('');
@@ -22,7 +23,19 @@ const Signup = () => {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        // Reset district when city changes
+        if (name === 'city') {
+            const districts = getDistricts(value);
+            setFormData({
+                ...formData,
+                city: value,
+                district: districts[0] || ''
+            });
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -39,8 +52,11 @@ const Signup = () => {
 
         setLoading(true);
 
+        // Combine city and district for region field
+        const region = `${formData.city}, ${formData.district}`;
+
         try {
-            await signup(formData.email, formData.password, formData.name, formData.role, formData.region);
+            await signup(formData.email, formData.password, formData.name, formData.role, region);
             if (formData.role === 'provider') {
                 navigate('/provider-setup');
             } else {
@@ -70,6 +86,8 @@ const Signup = () => {
             setLoading(false);
         }
     };
+
+    const districts = formData.city ? getDistricts(formData.city) : [];
 
     return (
         <div className="auth-page">
@@ -136,22 +154,45 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Region</label>
-                        <div className="input-with-icon">
-                            <FiMapPin className="input-icon" />
-                            <select
-                                name="region"
-                                className="form-input"
-                                value={formData.region}
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value="">Select your city</option>
-                                {REGIONS.map(region => (
-                                    <option key={region} value={region}>{region}</option>
-                                ))}
-                            </select>
+                    {/* City + District selection */}
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label className="form-label">City</label>
+                            <div className="input-with-icon">
+                                <FiMapPin className="input-icon" />
+                                <select
+                                    name="city"
+                                    className="form-input"
+                                    value={formData.city}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    <option value="">Select city</option>
+                                    {CITIES.map(city => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">District</label>
+                            <div className="input-with-icon">
+                                <FiMapPin className="input-icon" />
+                                <select
+                                    name="district"
+                                    className="form-input"
+                                    value={formData.district}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={!formData.city}
+                                >
+                                    <option value="">Select district</option>
+                                    {districts.map(district => (
+                                        <option key={district} value={district}>{district}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
 

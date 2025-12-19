@@ -10,26 +10,39 @@ export const SERVICE_CATEGORIES = [
     { id: 'mechanic', name: 'Mechanic', icon: '🔩', description: 'Vehicle repair, maintenance' }
 ];
 
-// Regions/Cities
-export const REGIONS = [
-    'Karachi',
-    'Lahore',
-    'Islamabad',
-    'Rawalpindi',
-    'Faisalabad',
-    'Multan',
-    'Peshawar',
-    'Quetta',
-    'Hyderabad',
-    'Sialkot'
-];
+// Locations: City → Districts
+// 'City Square' is the default district for all cities
+// You can add more districts per city as needed
+export const LOCATIONS = {
+    'Karachi': ['City Square'],
+    'Lahore': ['City Square'],
+    'Islamabad': ['City Square'],
+    'Rawalpindi': ['City Square'],
+    'Faisalabad': ['City Square'],
+    'Multan': ['City Square'],
+    'Peshawar': ['City Square'],
+    'Quetta': ['City Square'],
+    'Hyderabad': ['City Square'],
+    'Sialkot': ['City Square']
+};
+
+// Get all cities
+export const CITIES = Object.keys(LOCATIONS);
+
+// Get districts for a city
+export const getDistricts = (city) => LOCATIONS[city] || [];
+
+// Legacy support - flat list of regions (city names)
+export const REGIONS = CITIES;
 
 // Request statuses
 export const REQUEST_STATUS = {
     REQUESTED: 'requested',
     CONFIRMED: 'confirmed',
     COMPLETED: 'completed',
-    CANCELLED: 'cancelled'
+    PAID: 'paid',           // Cash payment confirmed
+    CANCELLED: 'cancelled',
+    EXPIRED: 'expired'      // No response within 24 hours
 };
 
 // Cancellation types

@@ -1,10 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiHome, FiSearch, FiUser, FiLogOut, FiGrid, FiSettings } from 'react-icons/fi';
+import { useNotifications } from '../context/NotificationsContext';
+import { FiHome, FiSearch, FiLogOut, FiGrid, FiSettings, FiBell } from 'react-icons/fi';
 import './Navbar.css';
 
 const Navbar = () => {
     const { user, userData, logout } = useAuth();
+    const { unreadCount } = useNotifications();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -43,6 +45,14 @@ const Navbar = () => {
                 <div className="navbar-actions">
                     {user ? (
                         <>
+                            {/* Notifications Bell */}
+                            <Link to={getDashboardLink()} className="notification-btn" title="Notifications">
+                                <FiBell />
+                                {unreadCount > 0 && (
+                                    <span className="notification-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
+                                )}
+                            </Link>
+
                             <Link to={getDashboardLink()} className="nav-link">
                                 <FiGrid />
                                 <span>Dashboard</span>
