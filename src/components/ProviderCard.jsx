@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SERVICE_CATEGORIES } from '../config/constants';
-import { FiMapPin, FiStar, FiClock, FiCheck, FiAlertTriangle } from 'react-icons/fi';
+import { FiMapPin, FiStar, FiClock, FiCheck, FiAlertTriangle, FiShield } from 'react-icons/fi';
 import './ProviderCard.css';
 
 const ProviderCard = ({ provider }) => {
@@ -29,6 +29,7 @@ const ProviderCard = ({ provider }) => {
     };
 
     const reliabilityBadge = getReliabilityBadge();
+    const isVerified = provider.verificationStatus === 'approved';
 
     const formatAvailability = () => {
         if (!provider.availability?.days?.length) return 'Contact for availability';
@@ -49,7 +50,14 @@ const ProviderCard = ({ provider }) => {
                     )}
                 </div>
                 <div className="provider-info">
-                    <h3 className="provider-name">{provider.name}</h3>
+                    <h3 className="provider-name">
+                        {provider.name}
+                        {isVerified && (
+                            <span className="verified-badge" title="ID Verified">
+                                <FiShield />
+                            </span>
+                        )}
+                    </h3>
                     <span className="provider-category">
                         {getCategoryIcon(provider.category)} {getCategoryName(provider.category)}
                     </span>

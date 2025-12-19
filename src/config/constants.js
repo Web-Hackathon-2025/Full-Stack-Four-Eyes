@@ -10,29 +10,64 @@ export const SERVICE_CATEGORIES = [
     { id: 'mechanic', name: 'Mechanic', icon: '🔩', description: 'Vehicle repair, maintenance' }
 ];
 
-// Locations: City → Districts
-// 'City Square' is the default district for all cities
-// You can add more districts per city as needed
+// Detailed Locations: City → Zone → Areas
 export const LOCATIONS = {
-    'Karachi': ['City Square'],
-    'Lahore': ['City Square'],
-    'Islamabad': ['City Square'],
-    'Rawalpindi': ['City Square'],
-    'Faisalabad': ['City Square'],
-    'Multan': ['City Square'],
-    'Peshawar': ['City Square'],
-    'Quetta': ['City Square'],
-    'Hyderabad': ['City Square'],
-    'Sialkot': ['City Square']
+    'Lahore': {
+        'DHA Lahore (Defence)': ['Phase 1-4', 'Phase 5', 'Phase 6', 'Phase 8 (Ex-Park View)'],
+        'Gulberg Zone': ['Gulberg I-III', 'Model Town', 'Garden Town', 'Faisal Town'],
+        'Iqbal Zone': ['Johar Town', 'Wapda Town', 'Township', 'Allama Iqbal Town'],
+        'Bahria Town': ['Bahria Town Proper', 'Bahria Orchard']
+    },
+    'Islamabad': {
+        'F-Series Sectors': ['F-6 (Super Market)', 'F-7 (Jinnah Super)', 'F-8', 'F-10', 'F-11'],
+        'G-Series Sectors': ['G-6 (Aabpara)', 'G-10', 'G-11', 'G-13'],
+        'Societies': ['Bahria Town ISB', 'DHA Islamabad', 'Gulberg Greens']
+    },
+    'Karachi': {
+        'South District': ['DHA Karachi', 'Clifton', 'Saddar'],
+        'East District': ['Gulshan-e-Iqbal', 'Gulistan-e-Johar', 'PECHS'],
+        'Central District': ['North Nazimabad', 'Gulberg (F.B Area)', 'Nazimabad']
+    },
+    'Rawalpindi': {
+        'City Center': ['City Center']
+    },
+    'Faisalabad': {
+        'City Center': ['City Center']
+    },
+    'Multan': {
+        'City Center': ['City Center']
+    },
+    'Peshawar': {
+        'City Center': ['City Center']
+    },
+    'Quetta': {
+        'City Center': ['City Center']
+    },
+    'Hyderabad': {
+        'City Center': ['City Center']
+    },
+    'Sialkot': {
+        'City Center': ['City Center']
+    }
 };
 
 // Get all cities
 export const CITIES = Object.keys(LOCATIONS);
 
-// Get districts for a city
-export const getDistricts = (city) => LOCATIONS[city] || [];
+// Get zones for a city
+export const getZones = (city) => {
+    if (!city || !LOCATIONS[city]) return [];
+    return Object.keys(LOCATIONS[city]);
+};
 
-// Legacy support - flat list of regions (city names)
+// Get areas for a city and zone
+export const getAreas = (city, zone) => {
+    if (!city || !zone || !LOCATIONS[city] || !LOCATIONS[city][zone]) return [];
+    return LOCATIONS[city][zone];
+};
+
+// Legacy support - flat districts (for backwards compat)
+export const getDistricts = (city) => getZones(city);
 export const REGIONS = CITIES;
 
 // Request statuses

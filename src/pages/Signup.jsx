@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { CITIES, getDistricts } from '../config/constants';
+import { CITIES, getZones, getAreas } from '../config/constants';
 import { FiMail, FiLock, FiUser, FiMapPin, FiAlertCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import './Auth.css';
@@ -13,7 +13,8 @@ const Signup = () => {
         password: '',
         confirmPassword: '',
         city: '',
-        district: '',
+        zone: '',
+        area: '',
         role: 'customer'
     });
     const [error, setError] = useState('');
@@ -25,13 +26,22 @@ const Signup = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Reset district when city changes
         if (name === 'city') {
-            const districts = getDistricts(value);
+            const zones = getZones(value);
+            const firstZone = zones[0] || '';
+            const areas = getAreas(value, firstZone);
             setFormData({
                 ...formData,
                 city: value,
-                district: districts[0] || ''
+                zone: firstZone,
+                area: areas[0] || ''
+            });
+        } else if (name === 'zone') {
+            const areas = getAreas(formData.city, value);
+            setFormData({
+                ...formData,
+                zone: value,
+                area: areas[0] || ''
             });
         } else {
             setFormData({ ...formData, [name]: value });
@@ -52,8 +62,10 @@ const Signup = () => {
 
         setLoading(true);
 
-        // Combine city and district for region field
-        const region = `${formData.city}, ${formData.district}`;
+        // Combine location: "City, Zone, Area"
+        const region = formData.area
+            ? `${formData.city}, ${formData.zone}, ${formData.area}`
+            : `${formData.city}, ${formData.zone}`;
 
         try {
             await signup(formData.email, formData.password, formData.name, formData.role, region);
@@ -87,7 +99,8 @@ const Signup = () => {
         }
     };
 
-    const districts = formData.city ? getDistricts(formData.city) : [];
+    const zones = formData.city ? getZones(formData.city) : [];
+    const areas = (formData.city && formData.zone) ? getAreas(formData.city, formData.zone) : [];
 
     return (
         <div className="auth-page">
@@ -154,47 +167,59 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    {/* City + District selection */}
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label className="form-label">City</label>
-                            <div className="input-with-icon">
-                                <FiMapPin className="input-icon" />
-                                <select
-                                    name="city"
-                                    className="form-input"
-                                    value={formData.city}
-                                    onChange={handleChange}
-                                    required
-                                >
-                                    <option value="">Select city</option>
-                                    {CITIES.map(city => (
-                                        <option key={city} value={city}>{city}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">District</label>
-                            <div className="input-with-icon">
-                                <FiMapPin className="input-icon" />
-                                <select
-                                    name="district"
-                                    className="form-input"
-                                    value={formData.district}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={!formData.city}
-                                >
-                                    <option value="">Select district</option>
-                                    {districts.map(district => (
-                                        <option key={district} value={district}>{district}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
+                    {/* Location: City → Zone → Area */}
+                    <div className="form-group">
+                        <label className="form-label"><FiMapPin /> City</label>
+                        <select
+                            name="city"
+                            className="form-input"
+                            value={formData.city}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select city</option>
+                            {CITIES.map(city => (
+                                <option key={city} value={city}>{city}</option>
+                            ))}
+                        </select>
                     </div>
+
+                    {formData.city && (
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Zone</label>
+                                <select
+                                    name="zone"
+                                    className="form-input"
+                                    value={formData.zone}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    <option value="">Select zone</option>
+                                    {zones.map(zone => (
+                                        <option key={zone} value={zone}>{zone}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {areas.length > 0 && (
+                                <div className="form-group">
+                                    <label className="form-label">Area</label>
+                                    <select
+                                        name="area"
+                                        className="form-input"
+                                        value={formData.area}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Select area</option>
+                                        {areas.map(area => (
+                                            <option key={area} value={area}>{area}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="form-row">
                         <div className="form-group">
