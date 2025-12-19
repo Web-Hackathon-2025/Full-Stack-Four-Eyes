@@ -1,0 +1,125 @@
+.cancellation-modal {
+    max-width: 500px;
+}
+
+/* Options */
+.cancellation-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+}
+
+.cancellation-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.cancellation-option:hover {
+    border-color: var(--primary);
+}
+
+.cancellation-option.selected {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.cancellation-option input {
+    display: none;
+}
+
+.option-content {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+}
+
+.option-icon {
+    font-size: 1.5rem;
+}
+
+.option-content strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.option-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Penalty Warning */
+.penalty-warning {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--warning);
+    margin-bottom: var(--space-lg);
+}
+
+.penalty-warning svg {
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.penalty-warning strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.penalty-warning p {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Summary */
+.cancellation-summary {
+    padding: var(--space-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-item span {
+    color: var(--text-secondary);
+}
+
+.summary-item.warning strong {
+    color: var(--danger);
+}
+
+/* Button colors */
+.btn-warning {
+    background: var(--warning);
+    color: #000;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+}
+
+.modal-icon.danger {
+    color: var(--danger);
+}

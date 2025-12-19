@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuth } from '../context/AuthContext';
-import { useNotifications } from '../context/NotificationsContext';
 import { REQUEST_STATUS, SERVICE_CATEGORIES } from '../config/constants';
 import { getPlaceholderAvatar } from '../utils/uploadHelper';
-import { FiCalendar, FiClock, FiMessageCircle, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import CancellationModal from '../components/CancellationModal';
+import { FiCalendar, FiClock, FiMessageCircle, FiX, FiCheck } from 'react-icons/fi';
 import './CustomerDashboard.css';
 
 const CustomerDashboard = () => {
     const { user, userData } = useAuth();
-    const { sendNotification } = useNotifications();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('all');
@@ -83,29 +82,9 @@ const CustomerDashboard = () => {
         }
     ];
 
-    const handleCancelRequest = async (requestId) => {
-        try {
-            await updateDoc(doc(db, 'requests', requestId), {
-                status: REQUEST_STATUS.CANCELLED,
-                cancelledBy: 'customer',
-                cancelledAt: serverTimestamp()
-            });
-
-            // Notify provider
-            const request = requests.find(r => r.id === requestId);
-            if (request?.providerId) {
-                await sendNotification(request.providerId, {
-                    type: 'cancellation',
-                    message: `${userData?.name} cancelled their request`,
-                    requestId
-                });
-            }
-
-            setCancelModal(null);
-            fetchRequests();
-        } catch (error) {
-            console.error('Error cancelling request:', error);
-        }
+    const handleCancelled = () => {
+        setCancelModal(null);
+        fetchRequests();
     };
 
     const getStatusBadge = (status) => {
@@ -246,30 +225,12 @@ const CustomerDashboard = () => {
 
                 {/* Cancel Confirmation Modal */}
                 {cancelModal && (
-                    <div className="modal-overlay" onClick={() => setCancelModal(null)}>
-                        <div className="modal-content" onClick={e => e.stopPropagation()}>
-                            <FiAlertCircle className="modal-icon warning" />
-                            <h2>Cancel Request?</h2>
-                            <p>Are you sure you want to cancel your request with {cancelModal.providerName}?</p>
-                            <p className="modal-warning">
-                                ⚠️ Cancellations may affect your account standing if done frequently.
-                            </p>
-                            <div className="modal-actions">
-                                <button
-                                    className="btn btn-secondary"
-                                    onClick={() => setCancelModal(null)}
-                                >
-                                    Keep Request
-                                </button>
-                                <button
-                                    className="btn btn-danger"
-                                    onClick={() => handleCancelRequest(cancelModal.id)}
-                                >
-                                    Yes, Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <CancellationModal
+                        request={cancelModal}
+                        onClose={() => setCancelModal(null)}
+                        onCancelled={handleCancelled}
+                        isProvider={false}
+                    />
                 )}
             </div>
         </div>

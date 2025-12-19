@@ -27,7 +27,7 @@ const Navbar = () => {
         <nav className="navbar">
             <div className="navbar-container">
                 <Link to="/" className="navbar-logo">
-                    <span className="logo-icon">🛠️</span>
+                    <img src="/android-chrome-512x512.png" alt="Karigar" className="logo-img" />
                     <span className="logo-text">Karigar</span>
                 </Link>
 
