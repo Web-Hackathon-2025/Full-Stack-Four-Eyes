@@ -6,7 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { REQUEST_STATUS, SERVICE_CATEGORIES } from '../config/constants';
 import { getPlaceholderAvatar } from '../utils/uploadHelper';
 import CancellationModal from '../components/CancellationModal';
-import { FiCalendar, FiClock, FiMessageCircle, FiX, FiCheck } from 'react-icons/fi';
+import ReviewModal from '../components/ReviewModal';
+import { FiCalendar, FiClock, FiMessageCircle, FiX, FiStar } from 'react-icons/fi';
 import './CustomerDashboard.css';
 
 const CustomerDashboard = () => {
@@ -15,6 +16,7 @@ const CustomerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('all');
     const [cancelModal, setCancelModal] = useState(null);
+    const [reviewModal, setReviewModal] = useState(null);
 
     useEffect(() => {
         if (user?.uid) {
@@ -210,11 +212,19 @@ const CustomerDashboard = () => {
                                             </button>
                                         )}
 
-                                        {/* Review button - only for completed */}
-                                        {request.status === REQUEST_STATUS.COMPLETED && (
-                                            <button className="btn btn-primary-outline">
-                                                <FiCheck /> Leave Review
+                                        {/* Review button - only for completed without review */}
+                                        {(request.status === REQUEST_STATUS.COMPLETED || request.status === REQUEST_STATUS.PAID) && !request.hasReview && (
+                                            <button
+                                                className="btn btn-primary-outline"
+                                                onClick={() => setReviewModal(request)}
+                                            >
+                                                <FiStar /> Leave Review
                                             </button>
+                                        )}
+
+                                        {/* Already reviewed */}
+                                        {request.hasReview && (
+                                            <span className="reviewed-badge">✓ Reviewed</span>
                                         )}
                                     </div>
                                 </div>
@@ -230,6 +240,18 @@ const CustomerDashboard = () => {
                         onClose={() => setCancelModal(null)}
                         onCancelled={handleCancelled}
                         isProvider={false}
+                    />
+                )}
+
+                {/* Review Modal */}
+                {reviewModal && (
+                    <ReviewModal
+                        request={reviewModal}
+                        onClose={() => setReviewModal(null)}
+                        onReviewed={() => {
+                            setReviewModal(null);
+                            fetchRequests();
+                        }}
                     />
                 )}
             </div>
